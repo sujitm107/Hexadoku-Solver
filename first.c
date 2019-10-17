@@ -18,12 +18,11 @@ char** allocate_array(int rows, int cols){
 	}
 
 	return arr;
-	
 }
 
 char** solveSudoku(char** board){
 	char** temp = board;
-
+	
 	for(int r = 0; r<16; r++){
 		for(int c = 0; c<16; c++){
 			if(temp[r][c] == '-'){
@@ -37,21 +36,28 @@ char** solveSudoku(char** board){
 				present = checkRow(board, r, present);
 				present = checkCol(board, c, present);
 				present = checkSubGrid(board, r, c, present);
-/*	Prints present array			
+//	Prints present array			
 				for(int i = 0; i<16; i++){
 					printf("%d ", present[i]);
 				}
 				
 				printf("\n");
-*/
-				
-				
-				int i = 0;
-				while(present[i] != -1){
-					i++;
+
+
+				int index = 0;
+				while(present[index] != -1){
+					index++;
+					if(index == 16){ //this means that there are no options to put into the board, present is all 0s
+						return NULL;
+					}
 				}
 				
-				char fillIn = getCharOfValue(i);
+				free(present);
+				
+				char fillIn = getCharOfValue(index);
+				
+				//printf("r: %d, c: %d\n", r, c);
+				
 				
 				temp[r][c] = fillIn;
 				
@@ -92,7 +98,7 @@ int main(int argc, char** argv){
 	
 	char num;
 	char** board = allocate_array(16, 16);
-
+	
 	for(int r = 0; r<16; r++){
 		for(int c = 0; c<16; c++){
 			if(fscanf(fp, "%c\t", &num) >= 0){
@@ -102,10 +108,7 @@ int main(int argc, char** argv){
 	}
 	
 	board = solveSudoku(board);
-
 	printBoard(board);
-	
-		
 	return 0;
 }
 
@@ -120,7 +123,6 @@ int* checkRow(char** board, int row, int* present){
 		}		
 	}
 	return temp;
-
 }
 
 int* checkCol(char** board, int col, int* present){
@@ -134,7 +136,6 @@ int* checkCol(char** board, int col, int* present){
 		}		
 	}
 	return temp;
-
 }
 
 char getCharOfValue(int x){
@@ -190,14 +191,15 @@ int* checkSubGrid(char** board, int row, int col, int* present){
 		}
 		//printf("\n");  ----- FOR PRINTING
 	}
-	
 	return temp;
-
-
-
 }
 
 void printBoard(char** arr){
+	if(arr == NULL){
+		printf("no-solution\n");
+		return;
+	}
+	
 	for(int i = 0; i<16; i++){
 		for(int j = 0; j<16; j++){
 			printf("%c\t", arr[i][j]);
@@ -205,7 +207,3 @@ void printBoard(char** arr){
 		printf("\n");
 	}
 }
-
-
-
-
