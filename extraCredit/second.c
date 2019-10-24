@@ -87,6 +87,7 @@ char** solveSudoku(char** board){
     if(x == -1){
         //printf("Not valid sudoku\n");
         free_array(board, 16);
+        printf("breaking here 1\n");
         return NULL;
     }
     
@@ -105,13 +106,15 @@ char** solveSudoku(char** board){
                     present = checkRow(board, r, present);
                     present = checkCol(board, c, present);
                     present = checkSubGrid(board, r, c, present);
-        /*  Prints present array            
+        /*  Prints present array
+                    printf("r: %d, c: %d\n", r, c);            
                     for(int i = 0; i<16; i++){
                         printf("%d  ", present[i]);
                     }
                     
                     printf("\n");
         */
+        
                     
                     //checking for multiple options
                     int options = 0;
@@ -121,29 +124,54 @@ char** solveSudoku(char** board){
                         }
                     }
                     
-                    if(options > 1){
-                        runLimit++;
-                        free(present);
-                        break;
-                    }
-                    
-
                     int index = 0;
                     while(present[index] != 0){
                         index++;
                         if(index == 16){ //this means that there are no options to put into the board, present is all 0s
-                            //printf("r: %d, c: %d\n", r, c);
-                            //printf("No options\n");
-// a bit concerning that this ran through the autograder with the print statements. Q: IS THIS EVER RUNNING?
                             free(present);
                             //free_array(board, 16);
+                            //printf("breaking here 2\n");
                             return NULL;
                         }
                     }
-                    
-                    char fillIn = getCharOfValue(index);
-                    temp[r][c] = fillIn;
-                    free(present);
+
+                    if(options > 1){
+                        runLimit++;
+
+
+                        for(int i = 0; i<options; i++){
+                            char fillIn = getCharOfValue(index);
+                            temp[r][c] = fillIn;
+                            //printBoard(temp);
+                            //printf("I am running\n");
+                            if(solveSudoku(temp) == NULL){
+                                //get next option
+                                int oldIndex = index;
+                                index=0;
+
+                                while(present[index] != 0){
+                                    index++;
+
+                                    if(index == oldIndex){
+                                        index++;
+                                    }
+
+                                    if(index == 16){
+                                        free(present);
+                                        //printf("breaking here 3\n");
+                                        return NULL;
+                                    }
+                                }
+                            }
+                        }
+
+                        //free(present);
+                        break; //shouldn't make a difference
+                    } else{
+                        char fillIn = getCharOfValue(index);
+                        temp[r][c] = fillIn;
+                        free(present);
+                    }
                 }
             }
         }
@@ -177,6 +205,7 @@ int main(int argc, char** argv){
             }
         }   
     }
+    //printBoard(board);
     board = solveSudoku(board);
     printBoard(board);
     
